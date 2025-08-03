@@ -35,7 +35,8 @@ jobs:
       - name: Get bucket name from Terraform output
         id: bucket
         run: |
-              echo "bucket_name=$(terraform output -raw bucket_name)" >> "$GITHUB_OUTPUT"
+          BUCKET_NAME=$(terraform output -raw bucket_name | head -n 1)
+          echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
         working-directory: ./terraform
 
 
