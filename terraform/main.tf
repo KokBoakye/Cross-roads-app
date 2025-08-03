@@ -19,7 +19,7 @@ variable "aws_region" {
 
 resource "aws_s3_bucket" "static_site" {
   bucket = "crossy-road-with-three-js-static-site"
-  acl    = "public-read"
+
 
   website {
     index_document = "index.html"
