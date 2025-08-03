@@ -39,10 +39,17 @@ jobs:
       - name: Get bucket name from Terraform output
         id: bucket
         run: |
-          export TF_LOG=ERROR  
-          BUCKET_NAME=$(terraform output -raw bucket_name | tr -d '\n\r ')
-          echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
+          set -e
+          export TF_LOG=ERROR
+          # Capture raw bucket name output
+          BUCKET_NAME=$(terraform output -raw bucket_name)
+          # Trim any whitespace or newlines
+          BUCKET_NAME=$(echo "$BUCKET_NAME" | tr -d '\n\r ')
+          echo "Captured bucket name: '$BUCKET_NAME'"
+          # Set output for other steps
+          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         working-directory: ./terraform
+
        
       - name: Debug bucket name
         run: echo "Bucket name is '[${{ steps.bucket.outputs.bucket_name }}]'"
