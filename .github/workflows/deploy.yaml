@@ -37,11 +37,9 @@ jobs:
           which terraform
           terraform version
 
-
       - name: Debug terraform output raw bucket_name
         run: terraform output -raw bucket_name
         working-directory: ./terraform
-
 
       - name: Debug raw terraform output
         run: terraform output bucket_name
@@ -51,25 +49,17 @@ jobs:
         id: bucket
         run: |
           set -e
-          RAW_OUTPUT=$(terraform output -json bucket_name)
+          # Unset TERRAFORM_CLI_PATH to avoid wrapper debug output
+          unset TERRAFORM_CLI_PATH
+          RAW_OUTPUT=$(terraform output -json -no-color bucket_name)
           BUCKET_NAME=$(echo "$RAW_OUTPUT" | jq -r '.value')
           echo "Captured bucket name: '$BUCKET_NAME'"
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         working-directory: ./terraform
 
-
-      - name: List terraform directory files
-        run: ls -la ./terraform
-
-      - name: Show terraform outputs
-        run: terraform output
-        working-directory: ./terraform
-
-       
       - name: Debug bucket name
         run: echo "Bucket name is '[${{ steps.bucket.outputs.bucket_name }}]'"
 
-        
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
