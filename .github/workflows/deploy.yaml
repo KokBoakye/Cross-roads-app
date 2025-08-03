@@ -34,8 +34,10 @@ jobs:
 
       - name: Get bucket name from Terraform output
         id: bucket
-        run: echo "bucket_name=$(terraform output -raw bucket_name)" >> $GITHUB_OUTPUT
+        run: |
+              echo "bucket_name=$(terraform output -raw bucket_name)" >> "$GITHUB_OUTPUT"
         working-directory: ./terraform
+
 
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
