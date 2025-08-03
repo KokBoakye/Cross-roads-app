@@ -32,6 +32,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Debug terraform version and path
+        run: |
+          which terraform
+          terraform version
+
+
       - name: Debug terraform output raw bucket_name
         run: terraform output -raw bucket_name
         working-directory: ./terraform
@@ -45,14 +51,12 @@ jobs:
         id: bucket
         run: |
           set -e
+          # Use 'terraform' command, not 'terraform-bin'
           RAW_OUTPUT=$(terraform output -raw bucket_name)
-          # Extract only part before ::debug::
           BUCKET_NAME=$(echo "$RAW_OUTPUT" | cut -d ':' -f 1)
           echo "Captured bucket name: '$BUCKET_NAME'"
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         working-directory: ./terraform
-
-
 
       - name: List terraform directory files
         run: ls -la ./terraform
