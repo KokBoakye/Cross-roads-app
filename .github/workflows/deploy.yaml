@@ -35,12 +35,11 @@ jobs:
       - name: Get bucket name from Terraform output
         id: bucket
         run: |
-          echo "bucket_name=$(terraform output -raw bucket_name | tr -d '\n')" >> "$GITHUB_OUTPUT"
+          export TF_LOG=ERROR  
+          BUCKET_NAME=$(terraform output -raw bucket_name | tr -d '\n\r ')
+          echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
         working-directory: ./terraform
 
-      - name: Debug bucket name
-        run: |
-           echo "Bucket name is: ${{ steps.bucket.outputs.bucket_name }}"
 
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
@@ -49,7 +48,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Debug bucket name
+        run: echo "Bucket name is '${{ steps.bucket.outputs.bucket_name }}'"
+
+
       - name: Sync files to S3
-        run: |
-          echo "Syncing to bucket: ${{ steps.bucket.outputs.bucket_name }}"
-          aws s3 sync ./dist s3://${{ steps.bucket.outputs.bucket_name }} --delete --acl public-read
+        run: aws s3 sync ./dist s3://${{ steps.bucket.outputs.bucket_name }} --delete --acl public-read
