@@ -43,8 +43,15 @@ jobs:
 
       - name: Get bucket name from Terraform output
         id: bucket
-        run: echo "bucket_name=$(terraform output -raw bucket_name)" >> $GITHUB_OUTPUT
+        run: |
+          set -e
+          RAW_OUTPUT=$(terraform output -raw bucket_name)
+          # Extract only part before ::debug::
+          BUCKET_NAME=$(echo "$RAW_OUTPUT" | cut -d ':' -f 1)
+          echo "Captured bucket name: '$BUCKET_NAME'"
+          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         working-directory: ./terraform
+
 
 
       - name: List terraform directory files
