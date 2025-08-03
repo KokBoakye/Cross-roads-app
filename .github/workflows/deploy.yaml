@@ -50,10 +50,18 @@ jobs:
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         working-directory: ./terraform
 
+      - name: List terraform directory files
+        run: ls -la ./terraform
+
+      - name: Show terraform outputs
+        run: terraform output
+        working-directory: ./terraform
+
        
       - name: Debug bucket name
         run: echo "Bucket name is '[${{ steps.bucket.outputs.bucket_name }}]'"
 
+        
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
