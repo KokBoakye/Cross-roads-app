@@ -25,6 +25,13 @@ jobs:
         run: terraform init
         working-directory: ./terraform
 
+      - name: Terraform Destroy (clean up previous resources)
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
         working-directory: ./terraform
@@ -50,8 +57,9 @@ jobs:
         run: |
           set -e
           # Unset TERRAFORM_CLI_PATH to avoid wrapper debug output
-          unset TERRAFORM_CLI_PATH
-          RAW_OUTPUT=$(terraform output -json -no-color bucket_name)
+          # Use full path to terraform binary installed by setup-terraform action
+          TERRAFORM_BIN=$(which terraform)
+          RAW_OUTPUT=$($TERRAFORM_BIN output -json bucket_name)
           BUCKET_NAME=$(echo "$RAW_OUTPUT" | jq -r '.value')
           echo "Captured bucket name: '$BUCKET_NAME'"
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
