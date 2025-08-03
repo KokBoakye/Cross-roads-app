@@ -32,23 +32,20 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Debug terraform output raw bucket_name
+        run: terraform output -raw bucket_name
+        working-directory: ./terraform
+
+
       - name: Debug raw terraform output
         run: terraform output bucket_name
         working-directory: ./terraform
 
       - name: Get bucket name from Terraform output
         id: bucket
-        run: |
-          set -e
-          export TF_LOG=ERROR
-          # Capture raw bucket name output
-          BUCKET_NAME=$(terraform output -raw bucket_name)
-          # Trim any whitespace or newlines
-          BUCKET_NAME=$(echo "$BUCKET_NAME" | tr -d '\n\r ')
-          echo "Captured bucket name: '$BUCKET_NAME'"
-          # Set output for other steps
-          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
+        run: echo "bucket_name=$(terraform output -raw bucket_name)" >> $GITHUB_OUTPUT
         working-directory: ./terraform
+
 
       - name: List terraform directory files
         run: ls -la ./terraform
