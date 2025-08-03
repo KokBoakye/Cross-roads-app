@@ -51,12 +51,12 @@ jobs:
         id: bucket
         run: |
           set -e
-          # Use 'terraform' command, not 'terraform-bin'
-          RAW_OUTPUT=$(terraform output -raw bucket_name)
-          BUCKET_NAME=$(echo "$RAW_OUTPUT" | cut -d ':' -f 1)
+          RAW_OUTPUT=$(terraform output -json bucket_name)
+          BUCKET_NAME=$(echo "$RAW_OUTPUT" | jq -r '.value')
           echo "Captured bucket name: '$BUCKET_NAME'"
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
         working-directory: ./terraform
+
 
       - name: List terraform directory files
         run: ls -la ./terraform
