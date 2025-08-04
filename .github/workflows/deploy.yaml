@@ -57,7 +57,7 @@ jobs:
         run: |
           set -e
           # Unset TERRAFORM_CLI_PATH to avoid wrapper debug output
-          # Use full path to terraform binary installed by setup-terraform action
+          # Use full path to terraform binary install by setup-terraform action
           TERRAFORM_BIN=$(which terraform)
           RAW_OUTPUT=$($TERRAFORM_BIN output -json)
           BUCKET_NAME=$(echo "$RAW_OUTPUT" | jq -r '.bucket_name.value')
