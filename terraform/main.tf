@@ -18,16 +18,22 @@ variable "aws_region" {
 }
 
 resource "aws_s3_bucket" "static_site" {
-  bucket = "crossy-road-with-three-js-static-site"
-
-
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
-  }
-
+  bucket        = "crossy-road-with-three-js-static-site"
   force_destroy = true
 }
+
+resource "aws_s3_bucket_website_configuration" "website_config" {
+  bucket = aws_s3_bucket.static_site.bucket
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "index.html"
+  }
+}
+
 
 resource "aws_s3_bucket_public_access_block" "block" {
   bucket                  = aws_s3_bucket.static_site.id
