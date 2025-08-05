@@ -53,6 +53,7 @@ jobs:
         working-directory: ./terraform
 
       - name: Get bucket name from Terraform output
+        working-directory: ./terraform
         id: bucket
         run: |
           set -e
