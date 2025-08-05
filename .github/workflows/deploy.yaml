@@ -57,7 +57,6 @@ jobs:
         id: bucket
         run: |
           set -e
-
           # Ensure Terraform binary is set
           TERRAFORM_BIN=$(which terraform)
 
