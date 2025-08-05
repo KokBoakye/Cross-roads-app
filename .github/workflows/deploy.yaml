@@ -63,7 +63,6 @@ jobs:
 
             # Capture the output value directly (removes quotes with tr)
             BUCKET_NAME=$($TERRAFORM_BIN output bucket_name | tr -d '"')
-
             # Optional debug
             echo "Captured bucket name: $BUCKET_NAME"
 
