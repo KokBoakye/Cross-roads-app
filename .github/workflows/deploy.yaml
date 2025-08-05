@@ -1,4 +1,4 @@
-name: Deploy to S3 via Terraform
+name: Sync files to S3 
 
 on:
   push:
@@ -15,64 +15,9 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+      
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform
-
-      - name: Terraform Destroy (clean up previous resources)
-        run: terraform destroy -auto-approve
-        working-directory: ./terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ./terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Debug terraform version and path
-        run: |
-          which terraform
-          terraform version
-
-      - name: Debug terraform output raw bucket_name
-        run: terraform output -raw bucket_name
-        working-directory: ./terraform
-
-      - name: Debug raw terraform output
-        run: terraform output bucket_name
-        working-directory: ./terraform
-
-      - name: Get bucket name from Terraform output
-        working-directory: ./terraform
-        id: bucket
-        run: |
-            set -e
-
-            # Use the Terraform binary directly
-            TERRAFORM_BIN="/home/runner/work/_temp/0297085c-7cbb-408f-a555-5ff3ed72a316/terraform-bin"
-
-            # Capture the output value directly (removes quotes with tr)
-            BUCKET_NAME=$($TERRAFORM_BIN output bucket_name | tr -d '"')
-            # Optional debug
-            echo "Captured bucket name: $BUCKET_NAME"
-
-            # Set GitHub Actions output
-            echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
-        shell: bash
-
-      - name: Debug bucket name
-        run: echo "Bucket name is '[${{ steps.bucket.outputs.bucket_name }}]'"
-
+    
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -81,4 +26,9 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Sync files to S3 bucket
-        run: aws s3 sync ./dist s3://${{ steps.bucket.outputs.bucket_name }} --delete --acl public-read
+        run: aws s3 sync ./dist s3://${{ steps }} --delete --acl public-read
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          bucket: ${{ secrets.BUCKET_NAME }}
