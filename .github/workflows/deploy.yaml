@@ -56,28 +56,19 @@ jobs:
         working-directory: ./terraform
         id: bucket
         run: |
-          set -e
+            set -e
 
-          TERRAFORM_BIN=$(which terraform)
+            # Use the Terraform binary directly
+            TERRAFORM_BIN="/home/runner/work/_temp/0297085c-7cbb-408f-a555-5ff3ed72a316/terraform-bin"
 
-          # Get just the JSON output (no command echoed before it)
-          RAW_OUTPUT=$($TERRAFORM_BIN output -json)
+            # Capture the output value directly (removes quotes with tr)
+            BUCKET_NAME=$($TERRAFORM_BIN output bucket_name | tr -d '"')
 
-          # Save clean JSON to file
-          echo "$RAW_OUTPUT" > tf_output.json
+            # Optional debug
+            echo "Captured bucket name: $BUCKET_NAME"
 
-          # Debug print
-          echo "Terraform JSON output:"
-          cat tf_output.json
-
-          # Extract bucket name using jq
-          BUCKET_NAME=$(jq -r '.bucket_name.value' tf_output.json)
-
-          # Export as GitHub Actions output
-          echo "Captured bucket name: '$BUCKET_NAME'"
-          echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
-
-
+            # Set GitHub Actions output
+            echo "bucket_name=$BUCKET_NAME" >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Debug bucket name
