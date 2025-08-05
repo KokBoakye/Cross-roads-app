@@ -57,20 +57,20 @@ jobs:
         id: bucket
         run: |
           set -e
-          # Ensure Terraform binary is set
+
           TERRAFORM_BIN=$(which terraform)
 
-          # Capture the raw JSON output from Terraform
-          RAW_OUTPUT=$($TERRAFORM_BIN output -json)
+          # Write Terraform output to a file
+          $TERRAFORM_BIN output -json > tf_output.json
 
-          # Print it for debugging (optional)
-          echo "Terraform output:"
-          echo "$RAW_OUTPUT"
+          # Debug: print the file
+          echo "Terraform output written to file:"
+          cat tf_output.json
 
-          # Extract the bucket name value using jq
-          BUCKET_NAME=$(echo "$RAW_OUTPUT" | jq -r '.bucket_name.value')
+          # Extract bucket name with jq
+          BUCKET_NAME=$(jq -r '.bucket_name.value' tf_output.json)
 
-          # Print and export it as a GitHub Actions output
+          # Print and export to GitHub Actions
           echo "Captured bucket name: '$BUCKET_NAME'"
           echo "bucket_name=$BUCKET_NAME" >> $GITHUB_OUTPUT
 
