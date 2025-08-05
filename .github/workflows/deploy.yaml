@@ -1,4 +1,4 @@
-name: Sync files to S3 
+name: Sync files to S3 and Deploy Terraform
 
 on:
   push:
@@ -13,12 +13,13 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
-      
 
-    
-      - name: Configure AWS CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -27,14 +28,11 @@ jobs:
 
       - name: Sync files to S3 bucket
         run: aws s3 sync ./dist s3://${{ secrets.BUCKET_NAME }} --delete
-        env:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          bucket: ${{ secrets.BUCKET_NAME }}
 
       - name: Terraform Init
         run: terraform init
+        working-directory: ./terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+        working-directory: ./terraform
