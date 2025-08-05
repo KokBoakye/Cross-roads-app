@@ -6,6 +6,9 @@ provider "aws" {
 resource "aws_s3_bucket" "static_site" {
   bucket        = "crossy-road-app"
   force_destroy = true
+  tags = {
+    Name        = "Crossy Road Static Site"
+  } 
 }
 
 
@@ -33,7 +36,7 @@ resource "aws_s3_bucket_public_access_block" "static_site_block" {
 }
 
 
-# Static site bucket policy for public read
+# Static site bucket policy for public read --
 resource "aws_s3_bucket_policy" "public_read" {
   bucket = aws_s3_bucket.static_site.id
 
@@ -51,8 +54,3 @@ resource "aws_s3_bucket_policy" "public_read" {
   })
 }
 
-# Output the bucket name
-output "bucket_name" {
-  description = "The name of the S3 bucket"
-  value       = aws_s3_bucket.static_site.bucket
-}
