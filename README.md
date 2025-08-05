@@ -45,9 +45,11 @@ Update any variables if needed and run:
 cd terraform
 terraform init     # Initializes and configures the remote backend
 terraform apply    # Provisions resources
-Make sure the backend S3 bucket (terraform-backend-crossy-road) already exists if you're using it for state storage.
+1. Make sure the backend S3 bucket (terraform-backend-crossy-road) already exists if you're using it for state storage.
+
 2. Deploy with GitHub Actions
 Push to the main branch to trigger the deployment workflow. The GitHub Actions workflow syncs the ./dist folder to your S3 bucket.
+
 3. View Site
 After deployment, access the website via the S3 bucket's static website endpoint (output by Terraform).
 🔐 Security
