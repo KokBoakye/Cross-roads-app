@@ -1,27 +1,16 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-  }
-  required_version = ">= 1.0"
-}
-
 provider "aws" {
   region = var.aws_region
 }
 
-variable "aws_region" {
-  type    = string
-  default = "eu-north-1"
-}
-
+# Static website bucket
 resource "aws_s3_bucket" "static_site" {
   bucket        = "crossy-road-app"
   force_destroy = true
 }
 
+
+
+# Website hosting configuration
 resource "aws_s3_bucket_website_configuration" "website_config" {
   bucket = aws_s3_bucket.static_site.bucket
 
@@ -34,8 +23,8 @@ resource "aws_s3_bucket_website_configuration" "website_config" {
   }
 }
 
-
-resource "aws_s3_bucket_public_access_block" "block" {
+# Public access block for static site bucket
+resource "aws_s3_bucket_public_access_block" "static_site_block" {
   bucket                  = aws_s3_bucket.static_site.id
   block_public_acls       = false
   block_public_policy     = false
@@ -43,6 +32,8 @@ resource "aws_s3_bucket_public_access_block" "block" {
   restrict_public_buckets = false
 }
 
+
+# Static site bucket policy for public read
 resource "aws_s3_bucket_policy" "public_read" {
   bucket = aws_s3_bucket.static_site.id
 
@@ -60,6 +51,7 @@ resource "aws_s3_bucket_policy" "public_read" {
   })
 }
 
+# Output the bucket name
 output "bucket_name" {
   description = "The name of the S3 bucket"
   value       = aws_s3_bucket.static_site.bucket
