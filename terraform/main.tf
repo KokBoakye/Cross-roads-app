@@ -18,7 +18,7 @@ variable "aws_region" {
 }
 
 resource "aws_s3_bucket" "static_site" {
-  bucket        = "crossy-road-with-three-js-static-site"
+  bucket        = "crossy-road-app"
   force_destroy = true
 }
 
